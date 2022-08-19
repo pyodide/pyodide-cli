@@ -1,9 +1,8 @@
 from importlib.metadata import entry_points
 
-import typer
+import typer  # type: ignore[import]
 
 from . import __version__
-
 
 app = typer.Typer(add_completion=False)
 
