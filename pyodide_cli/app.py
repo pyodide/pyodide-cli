@@ -28,23 +28,6 @@ def callback(
     pass
 
 
-def _register_callable(func, name):
-    @app.command(
-        name,
-        help=func.__doc__,
-        context_settings={"allow_extra_args": True, "ignore_unknown_options": True},
-    )
-    def _cmd(
-        help: bool = typer.Option(False),
-        ctx: typer.Context = typer.Context,
-    ):
-        if help:
-            typer.echo(ctx.get_help())
-            raise typer.Exit()
-        else:
-            func(*ctx.args)
-
-
 def register_plugins():
     eps = entry_points(group="pyodide.cli")
     plugins = {ep.name: ep.load() for ep in eps}
@@ -52,7 +35,9 @@ def register_plugins():
         if isinstance(module, typer.Typer):
             app.add_typer(module, name=plugin_name)
         elif callable(module):
-            _register_callable(module, plugin_name)
+            app.command(
+                plugin_name,
+            )(module)
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")
 
