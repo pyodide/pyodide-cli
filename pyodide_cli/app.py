@@ -20,7 +20,11 @@ def callback(
         None, "--version", callback=version_callback, is_eager=True
     ),
 ):
-    """A command line interface for Pyodide."""
+    """A command line interface for Pyodide.
+
+    Other CLI subcommands are registered via the plugin system by installing
+    Pyodide compatible packages (e.g. pyodide-build).
+    """
     pass
 
 
