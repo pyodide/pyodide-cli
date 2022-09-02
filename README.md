@@ -6,7 +6,7 @@
 
 The command line interface for the Pyodide project.
 
-In most cases, you do not need to install this package direcly, and it would be installed as
+In most cases, you do not need to install this package directly, and it would be installed as
 a dependency of other packages in the ecosystem (e.g. pyodide-build).
 
 ## Installation
