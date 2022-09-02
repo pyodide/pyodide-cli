@@ -35,9 +35,11 @@ def register_plugins():
         if isinstance(module, typer.Typer):
             app.add_typer(module, name=plugin_name)
         elif callable(module):
-            app.command(
-                plugin_name,
-            )(module)
+            context_settings = getattr(module, "typer_context_settings", {})
+            kwargs = {}
+            if context_settings:
+                kwargs = {"context_settings": context_settings}
+            app.command(plugin_name, **kwargs)(module)
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")
 
