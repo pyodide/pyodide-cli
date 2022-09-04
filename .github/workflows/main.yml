@@ -10,7 +10,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint:
+  test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -20,8 +20,8 @@ jobs:
       - name: Install
         shell: bash -l {0}
         run: |
-          python -m install -e .
-          python -m install pytest
+          python -m pip install -e .
+          python -m pip install pytest
       - name: Test
         shell: bash -l {0}
         run: |
