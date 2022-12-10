@@ -33,7 +33,7 @@ You can register a subcommand in the `pyodide` CLI in your own package by:
    ```toml
    [options.entry_points]
    pyodide.cli =
-    do_something = <your-package>.cli:main
+    do_something = "<your-package>.cli:main"
    ```
 
    or
