@@ -22,6 +22,32 @@ To get a list of available CLI commands,
 pyodide --help
 ```
 
+## Developers
+
+You can register a subcommand in the `pyodide` CLI in your own package by:
+
+1. adding a dependency on `pyodide-cli`
+2. Adding a `pyodide.cli` [entry point](https://setuptools.pypa.io/en/latest/userguide/entry_point.html). For example, with
+
+   **setup.cfg**
+   ```toml
+   [options.entry_points]
+   pyodide.cli =
+    do_something = "<your-package>.cli:main"
+   ```
+
+   or
+
+   **pyproject.toml**
+   ```toml
+   [project.entry-points."pyodide.cli"]
+   do_something = "<your-package>.cli:main"
+   ```
+
+   where in this example `main` needs to be a function with type annotations
+   that can be converted to a CLI with [typer](https://typer.tiangolo.com/).
+
+
 ## License
 
 pyodide-cli uses the [Mozilla Public License Version
