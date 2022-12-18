@@ -1,3 +1,4 @@
+import sys
 from importlib.metadata import entry_points
 
 import typer  # type: ignore[import]
@@ -29,6 +30,7 @@ def callback(
 
 
 def register_plugins():
+    """Register subcommands via the ``pyodide.cli`` entry-point"""
     eps = entry_points(group="pyodide.cli")
     plugins = {ep.name: ep.load() for ep in eps}
     for plugin_name, module in plugins.items():
@@ -45,6 +47,11 @@ def main():
     register_plugins()
     app()
 
+
+if "sphinx" in sys.modules and __name__ != "__main__":
+    # Create the typer click object to generate docs with sphinx-click
+    register_plugins()
+    typer_click_object = typer.main.get_command(app)
 
 if __name__ == "__main__":
     main()
