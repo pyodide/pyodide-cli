@@ -1,0 +1,11 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "plugin-test"
+version = "1.0.0"
+authors = []
+
+[project.entry-points."pyodide.cli"]
+plugin_test = "plugin_test.main:main"

@@ -1,5 +1,21 @@
+import pathlib
+import subprocess
 from multiprocessing import Process, Queue
 from subprocess import check_output
+
+import pytest
+
+
+@pytest.fixture(scope="module")
+def plugins():
+
+    test_plugin = pathlib.Path(__file__).parent / "plugin-test"
+
+    subprocess.run(["pip", "install", str(test_plugin)])
+
+    yield
+
+    subprocess.run(["pip", "uninstall", "-y", test_plugin.name])
 
 
 def test_cli_help():
@@ -33,3 +49,11 @@ def test_click_click_object_defintion():
     p.join()
     app_dir = q.get()
     assert "typer_click_object" in app_dir
+
+
+def test_plugin_origin(plugins):
+
+    output = check_output(["pyodide", "--help"]).decode("utf-8")
+    msg = "Registered by: plugin-test"
+
+    assert msg in output
