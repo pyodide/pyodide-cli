@@ -32,7 +32,7 @@ def callback(
     pass
 
 
-def entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
+def _entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
     """Find package name from entrypoint"""
 
     top_level = entrypoint.value.split(".")[0]
@@ -49,7 +49,7 @@ def register_plugins():
     eps = entry_points(group="pyodide.cli")
     plugins = {ep.name: (ep.load(), ep) for ep in eps}
     for plugin_name, (module, ep) in plugins.items():
-        pkgname = entrypoint_to_pkgname(ep)
+        pkgname = _entrypoint_to_pkgname(ep)
         origin_text = f"Registered by: {pkgname}"
 
         if isinstance(module, typer.Typer):
