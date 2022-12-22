@@ -4,10 +4,11 @@ from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 
 import typer  # type: ignore[import]
+from typer.main import TyperInfo, solve_typer_info_help  # type: ignore[import]
 
 from . import __version__
 
-app = typer.Typer(add_completion=False)
+app = typer.Typer(add_completion=False, rich_markup_mode="markdown")
 
 
 def version_callback(value: bool):
@@ -31,7 +32,7 @@ def callback(
     pass
 
 
-def entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
+def _entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
     """Find package name from entrypoint"""
 
     top_level = entrypoint.value.split(".")[0]
@@ -39,20 +40,37 @@ def entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
     return dist.metadata["name"]
 
 
+def _inject_origin(docstring: str, origin: str) -> str:
+    return f"{docstring}\n\n{origin}"
+
+
 def register_plugins():
     """Register subcommands via the ``pyodide.cli`` entry-point"""
     eps = entry_points(group="pyodide.cli")
     plugins = {ep.name: (ep.load(), ep) for ep in eps}
     for plugin_name, (module, ep) in plugins.items():
-        pkgname = entrypoint_to_pkgname(ep)
+        pkgname = _entrypoint_to_pkgname(ep)
+        origin_text = f"Registered by: {pkgname}"
+
         if isinstance(module, typer.Typer):
+            typer_info = TyperInfo(module)
+            help_with_origin = _inject_origin(
+                solve_typer_info_help(typer_info), origin_text
+            )
             app.add_typer(
-                module, name=plugin_name, rich_help_panel=f"Registered by: {pkgname}"
+                module,
+                name=plugin_name,
+                rich_help_panel=origin_text,
+                help=help_with_origin,
             )
         elif callable(module):
             typer_kwargs = getattr(module, "typer_kwargs", {})
+            help_with_origin = _inject_origin(module.__doc__, origin_text)
             app.command(
-                plugin_name, rich_help_panel=f"Registered by: {pkgname}", **typer_kwargs
+                plugin_name,
+                rich_help_panel=origin_text,
+                help=help_with_origin,
+                **typer_kwargs,
             )(module)
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")

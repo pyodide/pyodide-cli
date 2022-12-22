@@ -8,4 +8,5 @@ version = "1.0.0"
 authors = []
 
 [project.entry-points."pyodide.cli"]
-plugin_test = "plugin_test.main:main"
+plugin_test_func = "plugin_test.main:main"
+plugin_test_app = "plugin_test.app:app"

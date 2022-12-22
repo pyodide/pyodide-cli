@@ -57,3 +57,12 @@ def test_plugin_origin(plugins):
     msg = "Registered by: plugin-test"
 
     assert msg in output
+
+
+@pytest.mark.parametrize("entrypoint", ["plugin_test_app", "plugin_test_func"])
+def test_plugin_origin_subcommand(plugins, entrypoint):
+
+    output = check_output(["pyodide", entrypoint, "--help"]).decode("utf-8")
+    msg = "Registered by: plugin-test"
+
+    assert msg in output
