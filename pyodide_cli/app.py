@@ -41,7 +41,7 @@ def _entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
 
 
 def _inject_origin(docstring: str, origin: str) -> str:
-    return f"{docstring}\n\n * {origin}"
+    return f"{docstring}\n\n{origin}"
 
 
 def register_plugins():
