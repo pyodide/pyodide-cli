@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## Unreleased
+
+## [0.2.3] - 2023-01-26
+
+### Changed
+  - The value of local variables is now not printed when error occurs.
+    ([#24](https://github.com/pyodide/pyodide-cli/pull/24))
+
 ## [0.2.2] - 2022-12-22
 ### Changed
  - `pyodide --help` will now group subcommands by their package name.
