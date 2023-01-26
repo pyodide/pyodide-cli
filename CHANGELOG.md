@@ -9,7 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.2.3] - 2023-01-26
 
 ### Changed
-  - The value of local variables will not be printed when error occurs in the `pyodide` CLI.
+  - The value of local variables is now not printed when error occurs.
     ([#24](https://github.com/pyodide/pyodide-cli/pull/24))
 
 ## [0.2.2] - 2022-12-22
