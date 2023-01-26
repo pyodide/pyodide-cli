@@ -8,7 +8,11 @@ from typer.main import TyperInfo, solve_typer_info_help  # type: ignore[import]
 
 from . import __version__
 
-app = typer.Typer(add_completion=False, rich_markup_mode="markdown", pretty_exceptions_show_locals=False)
+app = typer.Typer(
+    add_completion=False,
+    rich_markup_mode="markdown",
+    pretty_exceptions_show_locals=False,
+)
 
 
 def version_callback(value: bool):
