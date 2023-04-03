@@ -8,7 +8,6 @@ import pytest
 
 @pytest.fixture(scope="module")
 def plugins():
-
     test_plugin = pathlib.Path(__file__).parent / "plugin-test"
 
     subprocess.run(["pip", "install", str(test_plugin)])
@@ -52,7 +51,6 @@ def test_click_click_object_defintion():
 
 
 def test_plugin_origin(plugins):
-
     output = check_output(["pyodide", "--help"]).decode("utf-8")
     msg = "Registered by: plugin-test"
 
@@ -61,7 +59,6 @@ def test_plugin_origin(plugins):
 
 @pytest.mark.parametrize("entrypoint", ["plugin_test_app", "plugin_test_func"])
 def test_plugin_origin_subcommand(plugins, entrypoint):
-
     output = check_output(["pyodide", entrypoint, "--help"]).decode("utf-8")
     msg = "Registered by: plugin-test"
 
