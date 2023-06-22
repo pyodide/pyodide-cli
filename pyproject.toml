@@ -1,7 +1,45 @@
 [build-system]
-requires = ["setuptools>=42", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=61.2", "setuptools_scm[toml]>=6.2"]
 
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "pyodide-cli"
+version = "0.0.1"
+authors = [{name = "Pyodide developers"}]
+description = '"The command line interface for the Pyodide project"'
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+    "Operating System :: OS Independent",
+]
+requires-python = ">= 3.10"
+dependencies = [
+    "typer[all]",
+    "rich",
+]
+
+[project.readme]
+file = "README.md"
+content-type = "text/markdown"
+
+[project.urls]
+Homepage = "https://github.com/pyodide/pyodide"
+"Bug Tracker" = "https://github.com/pyodide/pyodide/issues"
+Documentation = "https://pyodide.org/en/stable/"
+
+[project.optional-dependencies]
+test = ["pytest"]
+
+[project.scripts]
+pyodide = "pyodide_cli.__main__:main"
+
+[tool.setuptools]
+package-dir = {"" = "."}
+include-package-data = false
+
+[tool.setuptools.packages]
+find = {namespaces = false}
 
 # Evable versioning via setuptools_scm
 [tool.setuptools_scm]
