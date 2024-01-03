@@ -1,6 +1,6 @@
-from functools import cache
 import sys
-from importlib.metadata import EntryPoint, Distribution
+from functools import cache
+from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 
@@ -19,17 +19,14 @@ app = typer.Typer(
 def version_callback(value: bool):
     if not value:
         return
-        
-    typer.echo(f"Pyodide CLI Version: {__version__}")
+
+    typer.echo(f"pyodide CLI version: {__version__}")
 
     eps = entry_points(group="pyodide.cli")
     # filter out duplicate pkgs
-    pkgs = {
-        _entrypoint_to_pkgname(ep): _entrypoint_to_version(ep)
-        for ep in eps
-    }
+    pkgs = {_entrypoint_to_pkgname(ep): _entrypoint_to_version(ep) for ep in eps}
     for pkg, version in pkgs.items():
-        typer.echo(f"{pkg} Version: {version}")
+        typer.echo(f"{pkg} version: {version}")
 
     raise typer.Exit()
 
@@ -38,7 +35,11 @@ def version_callback(value: bool):
 def callback(
     ctx: typer.Context,
     version: bool = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True, help="Show the version of the Pyodide CLI",
+        None,
+        "--version",
+        callback=version_callback,
+        is_eager=True,
+        help="Show the version of the Pyodide CLI",
     ),
 ):
     """A command line interface for Pyodide.
@@ -51,7 +52,7 @@ def callback(
 
 @cache
 def _entrypoint_to_distribution(entrypoint: EntryPoint) -> Distribution:
-    """Find package ditribution from entrypoint"""
+    """Find package distribution from entrypoint"""
     top_level = entrypoint.value.split(".")[0]
     dist = importlib_distribution(top_level)
     return dist
