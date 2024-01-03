@@ -19,8 +19,12 @@ def plugins():
 
 def test_cli_help():
     output = check_output(["pyodide", "--help"]).decode("utf-8")
-    msg = "A command line interface for Pyodide."
-    assert msg in output
+    assert "A command line interface for Pyodide." in output
+
+def test_cli_version():
+    output = check_output(["pyodide", "--version"]).decode("utf-8")
+    assert "Pyodide CLI Version:" in output
+    assert "plugin-test Version: 1.0.0" in output
 
 
 def test_click_click_object_defintion():
