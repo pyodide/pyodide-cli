@@ -1,5 +1,6 @@
 import sys
-from importlib.metadata import EntryPoint
+from functools import cache
+from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 
@@ -16,16 +17,29 @@ app = typer.Typer(
 
 
 def version_callback(value: bool):
-    if value:
-        typer.echo(f"Pyodide CLI Version: {__version__}")
-        raise typer.Exit()
+    if not value:
+        return
+
+    typer.echo(f"pyodide CLI version: {__version__}")
+
+    eps = entry_points(group="pyodide.cli")
+    # filter out duplicate pkgs
+    pkgs = {_entrypoint_to_pkgname(ep): _entrypoint_to_version(ep) for ep in eps}
+    for pkg, version in pkgs.items():
+        typer.echo(f"{pkg} version: {version}")
+
+    raise typer.Exit()
 
 
 @app.callback(no_args_is_help=True)
 def callback(
     ctx: typer.Context,
     version: bool = typer.Option(
-        None, "--version", callback=version_callback, is_eager=True
+        None,
+        "--version",
+        callback=version_callback,
+        is_eager=True,
+        help="Show the version of the Pyodide CLI",
     ),
 ):
     """A command line interface for Pyodide.
@@ -36,12 +50,24 @@ def callback(
     pass
 
 
-def _entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
-    """Find package name from entrypoint"""
-
+@cache
+def _entrypoint_to_distribution(entrypoint: EntryPoint) -> Distribution:
+    """Find package distribution from entrypoint"""
     top_level = entrypoint.value.split(".")[0]
     dist = importlib_distribution(top_level)
+    return dist
+
+
+def _entrypoint_to_pkgname(entrypoint: EntryPoint) -> str:
+    """Find package name from entrypoint"""
+    dist = _entrypoint_to_distribution(entrypoint)
     return dist.metadata["name"]
+
+
+def _entrypoint_to_version(entrypoint: EntryPoint) -> str:
+    """Find package version from entrypoint"""
+    dist = _entrypoint_to_distribution(entrypoint)
+    return dist.metadata["version"]
 
 
 def _inject_origin(docstring: str, origin: str) -> str:
