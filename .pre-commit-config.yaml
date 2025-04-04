@@ -1,5 +1,5 @@
 default_language_version:
-  python: "3.10"
+  python: "3.12"
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: "v5.0.0"
@@ -24,7 +24,7 @@ repos:
     rev: "v3.19.1"
     hooks:
       - id: pyupgrade
-        args: ["--py310-plus"]
+        args: ["--py312-plus"]
 
   - repo: https://github.com/hadialqattan/pycln
     rev: "v2.5.0"
