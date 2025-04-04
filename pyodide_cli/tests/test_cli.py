@@ -1,4 +1,5 @@
 import pathlib
+import shutil
 import subprocess
 from multiprocessing import Process, Queue, set_start_method
 from subprocess import check_output
@@ -12,14 +13,18 @@ except RuntimeError:
 
 
 @pytest.fixture(scope="module")
-def plugins():
-    test_plugin = pathlib.Path(__file__).parent / "plugin-test"
+def plugins(tmp_path_factory):
+    tmp_dir = tmp_path_factory.mktemp("plugin-test")
+    source_plugin = pathlib.Path(__file__).parent / "plugin-test"
 
-    subprocess.run(["pip", "install", str(test_plugin)])
+    tmp_plugin = tmp_dir / "plugin-test"
+    shutil.copytree(source_plugin, tmp_plugin)
+
+    subprocess.run(["pip", "install", str(tmp_plugin)])
 
     yield
 
-    subprocess.run(["pip", "uninstall", "-y", test_plugin.name])
+    subprocess.run(["pip", "uninstall", "-y", "plugin-test"])
 
 
 def test_cli_help():
