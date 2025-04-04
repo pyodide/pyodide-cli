@@ -7,9 +7,9 @@ name = "pyodide-cli"
 dynamic = ["version"]
 authors = [{name = "Pyodide developers"}]
 description = '"The command line interface for the Pyodide project"'
+license = "MPL-2.0"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
     "Operating System :: OS Independent",
 ]
 requires-python = ">= 3.12"
