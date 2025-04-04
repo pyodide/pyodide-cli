@@ -1,9 +1,14 @@
 import pathlib
 import subprocess
-from multiprocessing import Process, Queue
+from multiprocessing import Process, Queue, set_start_method
 from subprocess import check_output
 
 import pytest
+
+try:
+    set_start_method("fork")
+except RuntimeError:
+    pass
 
 
 @pytest.fixture(scope="module")
