@@ -1,9 +1,12 @@
 name: main
 
-on: [push, pull_request]
+on:
+  push:
+    branches:
+      - main
+  pull_request:
 
-permissions:
-  contents: read
+permissions: {}
 
 concurrency:
   group: main-${{ github.head_ref || github.run_id }}
@@ -11,39 +14,24 @@ concurrency:
 
 jobs:
   test:
+    permissions:
+      contents: read
     strategy:
       matrix:
         runs-on: [ubuntu-latest, macos-latest]
       fail-fast: false
     runs-on: ${{ matrix.runs-on }}
     steps:
-      - uses: actions/checkout@v4.2.2
-      - uses: actions/setup-python@v5.5.0
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@8d9ed9ac5c53483de85588cdf95a591a75ab9f55 # v5.5.0
         with:
           python-version: 3.12
-      - name: Install
-        shell: bash -l {0}
-        run: |
-          python -m pip install -e ".[test]"
-      - name: Test
-        shell: bash -l {0}
-        run: |
-          python -m pytest
-  deploy:
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags')
-    environment: PyPi-deploy
-    steps:
-      - uses: actions/checkout@v4.2.2
 
-      - uses: actions/setup-python@v5.5.0
-      - name: Install requirements and build wheel
-        shell: bash -l {0}
-        run: |
-          python -m pip install build twine
-          python -m build .
-      - name: Publish package
-        uses: pypa/gh-action-pypi-publish@release/v1
-        with:
-          user: __token__
-          password: ${{ secrets.PYPI_API_TOKEN }}
+      - name: Install
+        run: python -m pip install -e ".[test]"
+
+      - name: Test
+        run: python -m pytest
