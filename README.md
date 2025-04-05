@@ -1,13 +1,14 @@
 # pyodide-cli
 
 [![PyPI Latest Release](https://img.shields.io/pypi/v/pyodide-cli.svg)](https://pypi.org/project/pyodide-cli/)
-![GHA](https://github.com/pyodide/pyodide-cli/actions/workflows/main.yml/badge.svg)
+![GHA-main](https://github.com/pyodide/pyodide-cli/actions/workflows/main.yml/badge.svg)
+![GHA-release](https://github.com/pyodide/pyodide-cli/actions/workflows/release.yml/badge.svg)
 [![codecov](https://codecov.io/gh/pyodide/pyodide-cli/branch/main/graph/badge.svg)](https://codecov.io/gh/pyodide/pyodide-cli)
 
 The command line interface for the Pyodide project.
 
 In most cases, you do not need to install this package directly, and it would be installed as
-a dependency of other packages in the ecosystem (e.g. pyodide-build).
+a dependency of other packages in the ecosystem (e.g., pyodide-build, pyodide-pack, auditwheel-emscripten, etc.)
 
 ## Installation
 

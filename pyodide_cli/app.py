@@ -45,7 +45,8 @@ def callback(
     """A command line interface for Pyodide.
 
     Other CLI subcommands are registered via the plugin system by installing
-    Pyodide compatible packages (e.g. pyodide-build).
+    Pyodide ecosystem packages (e.g. pyodide-build, pyodide-pack,
+    auditwheel-emscripten, etc.)
     """
     pass
 
