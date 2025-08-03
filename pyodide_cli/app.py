@@ -4,51 +4,49 @@ from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 
+import click
 import typer  # type: ignore[import]
 from typer.main import TyperInfo, solve_typer_info_help  # type: ignore[import]
 
 from . import __version__
 
-app = typer.Typer(
-    add_completion=False,
-    rich_markup_mode="markdown",
-    pretty_exceptions_show_locals=False,
-)
 
-
-def version_callback(value: bool):
-    if not value:
+def version_callback(
+    ctx: click.Context, _param: click.Option, value: bool | None
+) -> None:
+    if not value or ctx.resilient_parsing:
         return
 
-    typer.echo(f"pyodide CLI version: {__version__}")
+    click.echo(f"pyodide CLI version: {__version__}")
 
     eps = entry_points(group="pyodide.cli")
     # filter out duplicate pkgs
     pkgs = {_entrypoint_to_pkgname(ep): _entrypoint_to_version(ep) for ep in eps}
     for pkg, version in pkgs.items():
-        typer.echo(f"{pkg} version: {version}")
+        click.echo(f"{pkg} version: {version}")
 
-    raise typer.Exit()
+    ctx.exit()
 
 
-@app.callback(no_args_is_help=True)
-def callback(
-    ctx: typer.Context,
-    version: bool = typer.Option(
-        None,
-        "--version",
-        callback=version_callback,
-        is_eager=True,
-        help="Show the version of the Pyodide CLI",
-    ),
-):
+@click.group(invoke_without_command=True)
+@click.option(
+    "--version",
+    is_flag=True,
+    is_eager=True,
+    callback=version_callback,
+    expose_value=False,
+    help="Show the version of the Pyodide CLI",
+)
+@click.pass_context
+def cli(ctx: click.Context):
     """A command line interface for Pyodide.
 
     Other CLI subcommands are registered via the plugin system by installing
     Pyodide ecosystem packages (e.g. pyodide-build, pyodide-pack,
     auditwheel-emscripten, etc.)
     """
-    pass
+    if ctx.invoked_subcommand is None:
+        click.echo(ctx.get_help())
 
 
 @cache
@@ -88,34 +86,30 @@ def register_plugins():
             help_with_origin = _inject_origin(
                 solve_typer_info_help(typer_info), origin_text
             )
-            app.add_typer(
-                module,
-                name=plugin_name,
-                rich_help_panel=origin_text,
-                help=help_with_origin,
+        else:
+            help_with_origin = _inject_origin(
+                getattr(module, "__doc__", ""), origin_text
             )
+
+        if isinstance(module, click.Group):
+            cli.add_command(module, name=plugin_name)
         elif callable(module):
-            typer_kwargs = getattr(module, "typer_kwargs", {})
-            help_with_origin = _inject_origin(module.__doc__, origin_text)
-            app.command(
-                plugin_name,
-                rich_help_panel=origin_text,
-                help=help_with_origin,
-                **typer_kwargs,
-            )(module)
+            cli.add_command(
+                click.Command(plugin_name, callback=module, help=help_with_origin)
+            )
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")
 
 
 def main():
     register_plugins()
-    app()
+    cli()
 
 
 if "sphinx" in sys.modules and __name__ != "__main__":
     # Create the typer click object to generate docs with sphinx-click
     register_plugins()
-    typer_click_object = typer.main.get_command(app)
+    typer_click_object = cli
 
 if __name__ == "__main__":
     main()
