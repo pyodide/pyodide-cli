@@ -1,14 +1,91 @@
+from collections import defaultdict
+from gettext import gettext
+from typing import override
 import sys
 from functools import cache
 from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 
-import click
+import click  # type: ignore[import]
 import typer  # type: ignore[import]
 from typer.main import TyperInfo, solve_typer_info_help  # type: ignore[import]
 
 from . import __version__
+
+
+class OriginGroup(click.Group):
+    """A click Group to support grouped command help message by its origin."""
+
+    origin_map: defaultdict[str, str] = defaultdict()
+
+    @override
+    def add_command(
+        self, cmd: click.Command, name: str | None = None, *, origin: str | None = None
+    ) -> None:
+        """
+        Register click commands with its origin.
+        """
+        # if name is not provided, command name is used
+        if name is None:
+            name = cmd.name
+        if name is None:
+            name = ""  # FIXME: not the bes gt way?
+        if origin is None:
+            origin = ""
+
+        self.origin_map[name] = origin
+        super().add_command(cmd, name)
+
+    @override
+    def format_commands(self, ctx: click.Context, formatter: click.HelpFormatter):
+        """
+        Format commands grouped by origin, similar to rich formatting.
+        The rest of the behavior is similar to click.Group.format_commands.
+        """
+        names = self.list_commands(ctx)
+
+        # list of (origin, name, cmd)
+        commands: list[tuple[str, str, click.Command]] = []
+
+        for name in names:
+            cmd = self.get_command(ctx, name)
+            if cmd is None:
+                continue
+            if cmd.hidden:
+                continue
+
+            commands.append((name, self.origin_map.get(name, ""), cmd))
+
+        # sort by its origin, then by command name
+        commands.sort(key=lambda elem: (elem[1], elem[0]))
+
+        if len(commands):
+            limit = formatter.width - 6 - max(len(cmd[0]) for cmd in commands)
+
+            last_source: str = ""
+            rows = []
+
+            def write_row():
+                if rows:
+                    if len(last_source):
+                        source_desc = f" Registered by: {last_source}"
+                    else:
+                        source_desc = ""
+                    # NOTE: gettext is used in click! Any i18n support?
+                    with formatter.section(f"{gettext('Commands')}{source_desc}"):
+                        formatter.write_dl(rows)
+                rows.clear()
+
+            for name, source, cmd in commands:
+                if last_source != source:
+                    write_row()
+
+                help = cmd.get_short_help_str(limit)
+                rows.append((name, help))
+                last_source = source
+
+            write_row()
 
 
 def version_callback(
@@ -28,7 +105,7 @@ def version_callback(
     ctx.exit()
 
 
-@click.group(invoke_without_command=True)
+@click.group(cls=OriginGroup, invoke_without_command=True)
 @click.option(
     "--version",
     is_flag=True,
@@ -77,6 +154,7 @@ def register_plugins():
     """Register subcommands via the ``pyodide.cli`` entry-point"""
     eps = entry_points(group="pyodide.cli")
     plugins = {ep.name: (ep.load(), ep) for ep in eps}
+
     for plugin_name, (module, ep) in plugins.items():
         pkgname = _entrypoint_to_pkgname(ep)
         origin_text = f"Registered by: {pkgname}"
@@ -92,10 +170,15 @@ def register_plugins():
             )
 
         if isinstance(module, click.Group):
-            cli.add_command(module, name=plugin_name)
+            cli.add_command(module, name=plugin_name, origin=pkgname)
         elif callable(module):
             cli.add_command(
-                click.Command(plugin_name, callback=module, help=help_with_origin)
+                click.Command(
+                    plugin_name,
+                    callback=module,
+                    help=help_with_origin,
+                ),
+                origin=pkgname,
             )
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")
