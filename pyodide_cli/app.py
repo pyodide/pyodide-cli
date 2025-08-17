@@ -1,11 +1,11 @@
-from collections import defaultdict
-from gettext import gettext
-from typing import override
 import sys
+from collections import defaultdict
 from functools import cache
+from gettext import gettext
 from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
+from typing import override
 
 import click  # type: ignore[import]
 import typer  # type: ignore[import]
