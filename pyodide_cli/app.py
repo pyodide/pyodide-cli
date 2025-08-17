@@ -169,9 +169,7 @@ def register_plugins():
                 getattr(module, "__doc__", ""), origin_text
             )
 
-        if isinstance(module, click.Group):
-            cli.add_command(module, name=plugin_name, origin=pkgname)
-        elif callable(module):
+        if callable(module):
             typer_kwargs = getattr(module, "typer_kwargs", None)
             # construct Typer app and preserve typer_kwargs as of now
             if typer_kwargs is not None:
