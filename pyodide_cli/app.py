@@ -172,12 +172,27 @@ def register_plugins():
         if isinstance(module, click.Group):
             cli.add_command(module, name=plugin_name, origin=pkgname)
         elif callable(module):
-            cli.add_command(
-                click.Command(
+            typer_kwargs = getattr(module, "typer_kwargs", None)
+            # construct Typer app and preserve typer_kwargs as of now
+            if typer_kwargs is not None:
+                app = typer.Typer()
+                app.command(
+                    plugin_name,
+                    help=help_with_origin,
+                    **typer_kwargs,
+                )(module)
+                cmd = typer.main.get_command(app)
+            else:
+                # we need a new command with an updated help message
+                # set module (whether it is click, typer, or any other callable) as callback
+                cmd = click.Command(
                     plugin_name,
                     callback=module,
                     help=help_with_origin,
-                ),
+                )
+
+            cli.add_command(
+                cmd,
                 origin=pkgname,
             )
         else:
