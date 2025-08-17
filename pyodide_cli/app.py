@@ -26,16 +26,15 @@ class OriginGroup(click.Group):
         """
         Register click commands with its origin.
         """
-        # if name is not provided, command name is used
-        if name is None:
-            name = cmd.name
-        if name is None:
-            name = ""  # FIXME: not the bes gt way?
+        super().add_command(cmd, name)
+
+        # if name is None, click will raise an exception
+        name = str(name or cmd.name)
+
         if origin is None:
             origin = ""
 
         self.origin_map[name] = origin
-        super().add_command(cmd, name)
 
     @override
     def format_commands(self, ctx: click.Context, formatter: click.HelpFormatter):
