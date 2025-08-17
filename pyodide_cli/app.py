@@ -69,7 +69,7 @@ class OriginGroup(click.Group):
             def write_row():
                 if rows:
                     if len(last_source):
-                        source_desc = f" Registered by: {last_source}"
+                        source_desc = f" Registered by {last_source}"
                     else:
                         source_desc = ""
                     # NOTE: gettext is used in click! Any i18n support?
