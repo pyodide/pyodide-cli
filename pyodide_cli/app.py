@@ -7,9 +7,10 @@ from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
 from typing import override
 
-import click  # type: ignore[import]
-import typer  # type: ignore[import]
-from typer.main import TyperInfo, solve_typer_info_help  # type: ignore[import]
+import click
+import typer
+from typer.main import solve_typer_info_help
+from typer.models import TyperInfo
 
 from . import __version__
 
