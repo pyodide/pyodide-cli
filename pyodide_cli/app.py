@@ -64,7 +64,7 @@ class OriginGroup(click.Group):
             limit = formatter.width - 6 - max(len(cmd[0]) for cmd in commands)
 
             last_source: str = ""
-            rows = []
+            rows: list[tuple[str, str]] = []
 
             def write_row():
                 if rows:
@@ -169,32 +169,26 @@ def register_plugins():
                 getattr(module, "__doc__", ""), origin_text
             )
 
-        if callable(module):
-            typer_kwargs = getattr(module, "typer_kwargs", None)
-            # construct Typer app and preserve typer_kwargs as of now
-            if typer_kwargs is not None:
-                app = typer.Typer()
-                app.command(
-                    plugin_name,
-                    help=help_with_origin,
-                    **typer_kwargs,
-                )(module)
-                cmd = typer.main.get_command(app)
-            else:
-                # we need a new command with an updated help message
-                # set module (whether it is click, typer, or any other callable) as callback
-                cmd = click.Command(
-                    plugin_name,
-                    callback=module,
-                    help=help_with_origin,
-                )
-
-            cli.add_command(
-                cmd,
-                origin=pkgname,
-            )
+        if isinstance(module, click.Group):
+            cmd = module
+        elif isinstance(module, typer.Typer):
+            cmd = typer.main.get_command(module)
+        elif callable(module):
+            typer_kwargs = getattr(module, "typer_kwargs", {})
+            app = typer.Typer()
+            app.command(
+                plugin_name,
+                help=help_with_origin,
+                **typer_kwargs,
+            )(module)
+            cmd = typer.main.get_command(app)
         else:
             raise RuntimeError(f"Invalid plugin: {plugin_name}")
+
+        # directly manipulate click Command help message
+        cmd.help = help_with_origin
+
+        cli.add_command(cmd, name=plugin_name, origin=pkgname)
 
 
 def main():
