@@ -1,7 +1,6 @@
 import sys
 from collections import defaultdict
 from functools import cache
-from gettext import gettext
 from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
@@ -66,14 +65,16 @@ class OriginGroup(click.Group):
             last_source: str = ""
             rows: list[tuple[str, str]] = []
 
+            with formatter.section("Commands"):
+                pass
+
             def write_row():
                 if rows:
                     if len(last_source):
                         source_desc = f" Registered by {last_source}"
                     else:
                         source_desc = ""
-                    # NOTE: gettext is used in click! Any i18n support?
-                    with formatter.section(f"{gettext('Commands')}{source_desc}"):
+                    with formatter.section(f"{source_desc}"):
                         formatter.write_dl(rows)
                 rows.clear()
 
