@@ -77,6 +77,6 @@ def test_plugin_origin(plugins):
 )
 def test_plugin_origin_subcommand(plugins, entrypoint):
     output = check_output(["pyodide", entrypoint, "--help"]).decode("utf-8")
-    msg = "Registered by: plugin-test"
+    msg = "Registered by plugin-test:"
 
     assert msg in output

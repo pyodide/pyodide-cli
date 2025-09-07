@@ -158,7 +158,7 @@ def register_plugins():
 
     for plugin_name, (module, ep) in plugins.items():
         pkgname = _entrypoint_to_pkgname(ep)
-        origin_text = f"Registered by: {pkgname}"
+        origin_text = f"Registered by {pkgname}:"
 
         if isinstance(module, typer.Typer):
             typer_info = TyperInfo(module)
