@@ -10,3 +10,4 @@ authors = []
 [project.entry-points."pyodide.cli"]
 plugin_test_func = "plugin_test.main:main"
 plugin_test_app = "plugin_test.app:app"
+plugin_test_cli = "plugin_test.cli:cli"
