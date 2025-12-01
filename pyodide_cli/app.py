@@ -170,7 +170,7 @@ def register_plugins():
                 getattr(module, "__doc__", ""), origin_text
             )
 
-        if isinstance(module, click.Group):
+        if isinstance(module, click.Command):
             cmd = module
         elif isinstance(module, typer.Typer):
             cmd = typer.main.get_command(module)
