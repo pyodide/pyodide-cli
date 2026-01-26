@@ -70,4 +70,3 @@ def test_plugin_origin(plugins):
     msg = "Registered by plugin-test:"
 
     assert msg in output
-
