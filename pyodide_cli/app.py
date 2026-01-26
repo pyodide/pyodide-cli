@@ -8,8 +8,6 @@ from typing import override
 
 import click
 import typer
-from typer.main import solve_typer_info_help
-from typer.models import TyperInfo
 
 from . import __version__
 
