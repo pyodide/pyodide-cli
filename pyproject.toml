@@ -14,7 +14,7 @@ classifiers = [
 ]
 requires-python = ">= 3.12"
 dependencies = [
-    "typer",
+    "click",
     "rich",
 ]
 
