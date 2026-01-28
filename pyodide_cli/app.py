@@ -4,12 +4,21 @@ from functools import cache
 from importlib.metadata import Distribution, EntryPoint
 from importlib.metadata import distribution as importlib_distribution
 from importlib.metadata import entry_points
-from typing import override
+from typing import TYPE_CHECKING, override
 
 import click
-import typer
 
 from . import __version__
+
+if TYPE_CHECKING:
+    import typer
+
+try:
+    import typer  # noqa: F811
+
+    TYPER_AVAILABLE = True
+except ImportError:
+    TYPER_AVAILABLE = False
 
 
 class OriginGroup(click.Group):
@@ -154,9 +163,9 @@ def register_plugins():
         pkgname = _entrypoint_to_pkgname(ep)
         if isinstance(module, click.Command):
             cmd = module
-        elif isinstance(module, typer.Typer):
+        elif TYPER_AVAILABLE and isinstance(module, typer.Typer):
             cmd = typer.main.get_command(module)
-        elif callable(module):
+        elif TYPER_AVAILABLE and callable(module):
             typer_kwargs = getattr(module, "typer_kwargs", {})
             app = typer.Typer()
             app.command(
@@ -176,9 +185,9 @@ def main():
 
 
 if "sphinx" in sys.modules and __name__ != "__main__":
-    # Create the typer click object to generate docs with sphinx-click
+    # Create the click object to generate docs with sphinx-click
     register_plugins()
-    typer_click_object = cli
+    click_object = cli
 
 if __name__ == "__main__":
     main()

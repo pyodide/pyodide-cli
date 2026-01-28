@@ -45,8 +45,9 @@ You can register a subcommand in the `pyodide` CLI in your own package by:
    do_something = "<your-package>.cli:main"
    ```
 
-   where in this example `main` needs to be a function with type annotations
-   that can be converted to a CLI with [typer](https://typer.tiangolo.com/).
+   where in this example `main` needs to be either:
+   - A [click](https://click.palletsprojects.com/) command/group (recommended)
+   - A [typer](https://typer.tiangolo.com/) app or function (requires `typer` to be installed)
 
 
 ## License

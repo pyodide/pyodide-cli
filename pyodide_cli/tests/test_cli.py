@@ -39,8 +39,6 @@ def test_cli_version(plugins):
 
 
 def test_click_click_object_defintion():
-    # By default the typer-click-object is not defined
-    # Run in a separate process to make s
     q = Queue()
 
     def func(q: Queue, with_sphinx=False):
@@ -56,13 +54,13 @@ def test_click_click_object_defintion():
     p.start()
     p.join()
     app_dir = q.get()
-    assert "typer_click_object" not in app_dir
+    assert "click_object" not in app_dir
 
     p = Process(target=func, args=(q,), kwargs={"with_sphinx": True})
     p.start()
     p.join()
     app_dir = q.get()
-    assert "typer_click_object" in app_dir
+    assert "click_object" in app_dir
 
 
 def test_plugin_origin(plugins):
